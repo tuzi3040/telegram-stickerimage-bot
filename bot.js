@@ -92,7 +92,7 @@ bot.onText(/\/finish\s?(png)?\s?(\d+)?/i, function (msg, match) {
                         .then(function (srcimg) {
                             if (srcimg.indexOf('.') === -1) {
                                 var new_srcimg = srcimg + '.webp';
-                                fs.rename(srcimg, new_srcimg);
+                                fs.renameSync(srcimg, new_srcimg);
                                 srcimg = new_srcimg;
                             }
                             console.log('[' + chatId + '] File ' + fileId + ' saved to disk.');
@@ -189,6 +189,9 @@ bot.on('message', function (msg) {
     var chatId = msg.chat.id;
 
     if (msg.sticker && ramdb[chatId] && !ramdb[chatId].islocked) {
+        if (ramdb[chatId].files.indexOf(msg.sticker.file_id) !== -1) {
+            return bot.sendMessage(chatId, messages.msg.duplicated_sticker);
+        }
         if (ramdb[chatId].files.length >= config.maximages) {
             return bot.sendMessage(chatId, messages.msg.taskfull);
         }
